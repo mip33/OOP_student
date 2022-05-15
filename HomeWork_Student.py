@@ -8,20 +8,20 @@ class Student:
         self.grades = {}
 
     def rate_lecturer(self, lecturer, course, rate):
-        if (isinstance(lecturer, Lecturer) and course in self.courses_in_progress and
-                course in lecturer.courses_attached):
-            if course in lecturer.rating:
-                lecturer.rating[course] += [rate]
-            else:
-                lecturer.rating[course] = [rate]
+        if not isinstance(lecturer, Lecturer):
+            return 'Лектора нет в списке'
+        if course not in self.courses_in_progress or course not in lecturer.courses_attached:
+            return "Курс не найден"
+        if course in lecturer.rating:
+            lecturer.rating[course] += [rate]
         else:
-            return 'Ошибка'
+            lecturer.rating[course] = [rate]
 
     def average_grade(self):
         grades_list = []
         for grade in self.grades.values():
             grades_list += grade
-        average_grade = str(sum(grades_list) / len(grades_list))
+        average_grade = sum(grades_list) / len(grades_list)
         return average_grade
 
     def __str__(self):
@@ -47,7 +47,6 @@ class Mentor:
         self.courses_attached = []
 
 
-
 class Lecturer(Mentor):
     def __init__(self, name, surname):
         super().__init__(name, surname)
@@ -57,7 +56,7 @@ class Lecturer(Mentor):
         rates_list = []
         for rate in self.rating.values():
             rates_list += rate
-        average_rate = str(sum(rates_list) / len(rates_list))
+        average_rate = sum(rates_list) / len(rates_list)
         return average_rate
 
     def __str__(self):
@@ -76,17 +75,17 @@ class Lecturer(Mentor):
 
 class Reviewer(Mentor):
     def rate_hw(self, student, course, grade):
-        if isinstance(student, Student) and course in self.courses_attached and course in student.courses_in_progress:
-            if course in student.grades:
-                student.grades[course] += [grade]
-            else:
-                student.grades[course] = [grade]
+        if not isinstance(student, Student):
+            return 'Студента нет в списке'
+        if course not in self.courses_attached or course not in student.courses_in_progress:
+            return "Курс не найден"
+        if course in student.grades:
+            student.grades[course] += [grade]
         else:
-            return 'Ошибка'
+            student.grades[course] = [grade]
 
     def __str__(self):
         return f'Проверяющий \nИмя: {self.name} \nФамилия: {self.surname}\n'
-
 
 
 best_student_1 = Student('Иванов', 'Иван', 'boy')
@@ -123,21 +122,24 @@ print(best_student_1 > best_student_2)
 print(lecturer_cool_mentor_2 > best_student_2)
 print()
 
+
 def avg_grades_all(students_list, course):
     all_grades_list = []
     for student in students_list:
         if student.grades.get(course) is not None:
             all_grades_list += student.grades.get(course)
-    all_grades_avg = str(sum(all_grades_list) / len(all_grades_list))
+    all_grades_avg = sum(all_grades_list) / len(all_grades_list)
     print(f'Средняя оценка всех студентов за домашние задания по курсу {course}: {all_grades_avg}')
+
 
 def avg_rates_all(lecturer_list, course):
     all_rates_list = []
     for lecturer in lecturer_list:
         if lecturer.rating.get(course) is not None:
             all_rates_list += lecturer.rating.get(course)
-    all_rates_avg = str(sum(all_rates_list) / len(all_rates_list))
+    all_rates_avg = sum(all_rates_list) / len(all_rates_list)
     print(f'Средняя оценка всех лекторов в рамках курса {course}: {all_rates_avg}')
+
 
 avg_grades_all([best_student_1, best_student_2], 'Python')
 avg_grades_all([best_student_1, best_student_2], 'Git')
